@@ -1,6 +1,8 @@
 require "zipfian/version"
 
 class Zipfian
+  attr_reader :n, :s
+
   def initialize n, s
     unless n > 0 && n.is_a?(Integer)
       raise ArgumentError.new("Number of elements must be a positive integer")

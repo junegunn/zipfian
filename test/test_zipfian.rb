@@ -17,6 +17,12 @@ class TestZipfian < Test::Unit::TestCase
     assert_raise(ArgumentError) { z = Zipfian.new 100, -1 }
   end
 
+  def test_s_n
+    z = Zipfian.new 1000, 0.1
+    assert_equal 1000, z.n
+    assert_equal 0.1, z.s
+  end
+
   def test_invalid_rank
     z = Zipfian.new 1000, 0.1
 
@@ -29,12 +35,11 @@ class TestZipfian < Test::Unit::TestCase
   def test_pmf_cdf
     z = Zipfian.new 1000, 1
 
-    sum = 0
-    (1..1000).each do |i|
-      assert z.pmf(i) <= z.cdf(i)
-      assert z.pmf(i) < z.pmf(i - 1) if i > 1
-    end
     assert_equal z.pmf(1), z.cdf(1)
+    (2..1000).each do |i|
+      assert z.pmf(i) < z.cdf(i)
+      assert z.pmf(i) < z.pmf(i - 1)
+    end
     assert_equal 1, z.cdf(1000)
   end
 

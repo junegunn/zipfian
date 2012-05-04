@@ -23,11 +23,15 @@ Or install it yourself as:
 #  1.0: Exponent
 z = Zipfian.new 1000, 1.0
 
+puts z.n    # 1000
+puts z.s    # 0.1
+
 (1..1000).each do |i|
   puts [z.pmf(i), z.cdf(i)].join ' - '
 end
 
-puts z.sample
+puts z.sample    # Integer between 1 and 1000
+
 ```
 
 ## Disclaimer
