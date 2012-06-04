@@ -34,7 +34,7 @@ puts z.sample    # Integer between 1 and 1000
 
 ```
 
-## Disclaimer
+## Initialization overhead and caching
 
 On initialization, Zipfian precalculates and stores the values of cumulative distribution function for every integer in the range.
 As the number gets bigger, it will take more time and memory.
@@ -44,6 +44,18 @@ As the number gets bigger, it will take more time and memory.
 z = Zipfian.new 1000000, 0.5
 
 puts z.sample * 1000 - rand(1000)
+```
+
+To avoid repeated initialization when multiple `Zipfian` instances are used,
+you can optionally enable thread-safe caching of precalculated data at class-level
+by setting the third parameter of initializer to true.
+
+```ruby
+# Cache precalculated data
+z1 = Zipfian.new 1000000, 0.5, true
+
+# Returns immediately.
+z2 = Zipfian.new 1000000, 0.5
 ```
 
 ## Contributing

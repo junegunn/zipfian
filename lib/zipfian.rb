@@ -3,7 +3,12 @@ require "zipfian/version"
 class Zipfian
   attr_reader :n, :s
 
-  def initialize n, s
+  @@global_mutex = Mutex.new
+  @@mutexes      = {}
+  @@h            = {}
+  @@cdf          = {}
+
+  def initialize n, s, cache = false
     unless n > 0 && n.is_a?(Integer)
       raise ArgumentError.new("Number of elements must be a positive integer")
     end
@@ -14,25 +19,33 @@ class Zipfian
     @n   = n
     @s   = s
     sums = [0]
-    @h   = (1..@n).inject(0) { |sum, i| sums[i] = sum + 1.0 / (i ** @s) }
-    @cdf = (0..@n).map { |i| sums[i] / @h }
 
-    class << @cdf
-      def binary_search_index v
-        l = 0
-        r = self.length - 2
+    compute_h = lambda { (1..@n).inject(0) { |sum, i| sums[i] = sum + 1.0 / (i ** @s) } }
+    compute_cdf = lambda { (0..@n).map { |i| sums[i] / @h } }
 
-        while (c = (l + r) / 2) && l < r
-          if v < self[c]
-            r = c - 1
-          elsif v > self[c]
-            l = c + 1
-          else
-            return c
-          end
+    key = [n, s]
+    mutex = nil
+    if cache
+      @@global_mutex.synchronize do
+        mutex = @@mutexes[key] ||= Mutex.new
+      end
+      mutex.synchronize do
+        @h   = @@h[key]   ||= compute_h.call
+        @cdf = @@cdf[key] ||= compute_cdf.call
+      end
+    else
+      @@global_mutex.synchronize do
+        # Do not create mutex
+        mutex = @@mutexes[key]
+      end
+      if mutex
+        mutex.synchronize do
+          @h   = @@h[key]   || compute_h.call
+          @cdf = @@cdf[key] || compute_cdf.call
         end
-
-        v < self[c] ? c : c + 1
+      else
+        @h   = compute_h.call
+        @cdf = compute_cdf.call
       end
     end
   end
@@ -55,14 +68,40 @@ class Zipfian
   end
 
   def sample
-    @cdf.binary_search_index rand
+    binary_search_index @cdf, rand
   end
 
+  def self.cached
+    ret = []
+    @@global_mutex.synchronize do
+      @@mutexes.keys.each do |key|
+        ret << { :n => key.first, :s => key.last }
+      end
+    end
+    ret
+  end
 private
   def check_rank k
     unless k.is_a?(Integer) && k >= 1 && k <= @n
       raise ArgumentError.new("Rank must be a positive integer (max: #{@n})")
     end
+  end
+
+  def binary_search_index arr, v
+    l = 0
+    r = arr.length - 2
+
+    while (c = (l + r) / 2) && l < r
+      if v < arr[c]
+        r = c - 1
+      elsif v > arr[c]
+        l = c + 1
+      else
+        return c
+      end
+    end
+
+    v < arr[c] ? c : c + 1
   end
 end
 
