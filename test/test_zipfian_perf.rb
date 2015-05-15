@@ -3,11 +3,11 @@
 require 'rubygems'
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '../lib')
 require 'zipfian'
-require 'test-unit'
+require 'minitest/autorun'
 require 'benchmark'
 require 'parallelize'
 
-class TestZipfian < Test::Unit::TestCase
+class TestZipfian < MiniTest::Unit::TestCase
   def test_zipfian_performance
     cnt = 100000
 
@@ -26,7 +26,7 @@ class TestZipfian < Test::Unit::TestCase
         }.real
 
         print "Sample throughput (op/sec): "
-        puts cnt / Benchmark.measure {
+        puts thr * cnt / Benchmark.measure {
           thr.times.peach(thr) do |idx|
             cnt.times do |i|
               zps[idx].sample

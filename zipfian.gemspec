@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Zipfian::VERSION
 
-  gem.add_development_dependency 'test-unit'
   gem.add_development_dependency 'guard'
   gem.add_development_dependency 'guard-test'
   gem.add_development_dependency 'parallelize'

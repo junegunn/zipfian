@@ -3,21 +3,22 @@
 require 'rubygems'
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '../lib')
 require 'zipfian'
+require 'minitest/autorun'
 require 'test-unit'
 require 'parallelize'
 require 'benchmark'
 
 # TODO: naive tests
-class TestZipfian < Test::Unit::TestCase
+class TestZipfian < MiniTest::Unit::TestCase
   def test_init
-    assert_raise(ArgumentError) { z = Zipfian.new }
+    assert_raises(ArgumentError) { z = Zipfian.new }
 
     [0.9, 0, -1].each do |n|
-      assert_raise(ArgumentError) { z = Zipfian.new n, 1 }
+      assert_raises(ArgumentError) { z = Zipfian.new n, 1 }
     end
 
-    assert_raise(ArgumentError) { z = Zipfian.new 100, 0 }
-    assert_raise(ArgumentError) { z = Zipfian.new 100, -1 }
+    assert_raises(ArgumentError) { z = Zipfian.new 100, 0 }
+    assert_raises(ArgumentError) { z = Zipfian.new 100, -1 }
   end
 
   def test_s_n
@@ -30,8 +31,8 @@ class TestZipfian < Test::Unit::TestCase
     z = Zipfian.new 1000, 0.1
 
     [0.1, 0, 2000].each do |k|
-      assert_raise(ArgumentError) { z.pmf k }
-      assert_raise(ArgumentError) { z.cdf k }
+      assert_raises(ArgumentError) { z.pmf k }
+      assert_raises(ArgumentError) { z.cdf k }
     end
   end
 
