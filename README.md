@@ -24,7 +24,7 @@ Or install it yourself as:
 z = Zipfian.new 1000, 1.0
 
 puts z.n    # 1000
-puts z.s    # 0.1
+puts z.s    # 1.0
 
 (1..1000).each do |i|
   puts [z.pmf(i), z.cdf(i)].join ' - '

@@ -8,7 +8,7 @@ class Zipfian
   @@h            = {}
   @@cdf          = {}
 
-  def initialize n, s, cache = false
+  def initialize n, s, update_cache = false
     unless n > 0 && n.is_a?(Integer)
       raise ArgumentError.new("Number of elements must be a positive integer")
     end
@@ -25,7 +25,7 @@ class Zipfian
 
     key = [n, s]
     mutex = nil
-    if cache
+    if update_cache
       @@global_mutex.synchronize do
         mutex = @@mutexes[key] ||= Mutex.new
       end
